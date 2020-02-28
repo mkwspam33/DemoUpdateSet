@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>global.PASearchAjax</api_name>
+        <caller_access/>
+        <client_callable>true</client_callable>
+        <description>AJAX methods for search in Performance Analytics.</description>
+        <name>PASearchAjax</name>
+        <script><![CDATA[var PASearchAjax = Class.create();
+PASearchAjax.prototype = Object.extendsObject(AbstractAjaxProcessor, {
+    initialize: function(request, responseXML, gc) {
+        AbstractAjaxProcessor.prototype.initialize.call(this,request, responseXML, gc);
+    },
+
+    getSearchResults: function() {
+		var value = this.getParameter("sysparm_value");
+        var timer = this.getParameter("sysparm_timer");
+		var totalCount = 0;
+		
+        var tags = new GlideRecord("pa_tags");
+		tags.addEncodedQuery("labelLIKE" + value);
+		tags.orderBy("label");
+		tags.query();
+
+        var tagInfo = [];
+		var count = 0;
+
+        while (tags.next() && count < this.MAX_RESULTS) {
+			if (tags.canRead()) {
+				count++;
+            	tagInfo.push({"label": tags.getDisplayValue()+"",
+                          	"name": tags.sys_id+"",
+							  "type": "Tag"});
+			}
+        }
+		totalCount += count;
+		
+		var indicators = new GlideRecord("pa_indicators");
+		indicators.addQuery("display", true);
+		indicators.addEncodedQuery("nameLIKE" + value);
+		indicators.addNullQuery("benchmarking").addOrCondition("benchmarking", "equals", false);
+		indicators.orderBy("name");
+		indicators.query();
+		
+		var indicatorInfo = [];
+		count = 0;
+		
+        while (indicators.next() && count < this.MAX_RESULTS) {
+			if (indicators.canRead()) {
+				count++;
+            	indicatorInfo.push({"label": indicators.getDisplayValue()+"",
+                          	"name": indicators.sys_id+"",
+							  "type": "Name"});
+			}
+        }
+		totalCount += count;
+		
+		var result = {};
+		result.recordList = {};
+		result.recordList.Tag = tagInfo;
+		result.recordList.Name = indicatorInfo;
+		result.timer = timer;
+		result.rowCount = count;
+		return new global.JSON().encode(result);
+    },
+
+    type: 'PASearchAjax',
+	MAX_RESULTS: 5
+});]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2014-01-20 12:16:30</sys_created_on>
+        <sys_id>733d2007ef12110032a05ad595c0fbf6</sys_id>
+        <sys_mod_count>29</sys_mod_count>
+        <sys_name>PASearchAjax</sys_name>
+        <sys_package display_value="Performance Analytics" source="com.snc.pa">5d69f0f4db570010dd61ff561d961976</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GlobalUSDemo">d70c51f0db1b0010dd61ff561d96194b</sys_scope>
+        <sys_update_name>sys_script_include_733d2007ef12110032a05ad595c0fbf6</sys_update_name>
+        <sys_updated_by>matt.wilkofsky@snc</sys_updated_by>
+        <sys_updated_on>2020-02-28 15:01:09</sys_updated_on>
+    </sys_script_include>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GlobalUSDemo">d70c51f0db1b0010dd61ff561d96194b</claim_owner_scope>
+        <claim_timestamp>1708c50c7a80000001</claim_timestamp>
+        <metadata_update_name>sys_script_include_733d2007ef12110032a05ad595c0fbf6</metadata_update_name>
+        <previous_claim_app_version>1.0.0</previous_claim_app_version>
+        <previous_claim_name>GlobalUSDemo</previous_claim_name>
+        <previous_claim_scope>d70c51f0db1b0010dd61ff561d96194b</previous_claim_scope>
+        <sys_created_by>matt.wilkofsky@snc</sys_created_by>
+        <sys_created_on>2020-02-28 15:01:09</sys_created_on>
+        <sys_id>8a4c95f0db1b0010dd61ff561d961943</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>matt.wilkofsky@snc</sys_updated_by>
+        <sys_updated_on>2020-02-28 15:01:09</sys_updated_on>
+    </sys_claim>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GlobalUSDemo">d70c51f0db1b0010dd61ff561d96194b</claim_owner_scope>
+        <claim_timestamp>1708c50c7940000001</claim_timestamp>
+        <metadata_update_name>sys_script_include_733d2007ef12110032a05ad595c0fbf6</metadata_update_name>
+        <previous_claim_app_version>1.0.0</previous_claim_app_version>
+        <previous_claim_name>com.snc.pa</previous_claim_name>
+        <previous_claim_scope>com.snc.pa</previous_claim_scope>
+        <sys_created_by>matt.wilkofsky@snc</sys_created_by>
+        <sys_created_on>2020-02-28 15:01:09</sys_created_on>
+        <sys_id>c24c95f0db1b0010dd61ff561d961944</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>matt.wilkofsky@snc</sys_updated_by>
+        <sys_updated_on>2020-02-28 15:01:09</sys_updated_on>
+    </sys_claim>
+</record_update>
